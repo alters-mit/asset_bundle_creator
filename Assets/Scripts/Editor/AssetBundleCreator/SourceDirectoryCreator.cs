@@ -28,15 +28,11 @@ public abstract class SourceDirectoryCreator<T, U> : AssetBundleCreator<T, U>
     {
         DirectoryInfo sourceDirectory = new DirectoryInfo(ArgumentParser.Get("source_directory"));
         DirectoryInfo outputDirectory = new DirectoryInfo(ArgumentParser.Get("output_directory"));
-        // Create a new library.
-        RecordLibrary<U> library = new RecordLibrary<U>();
-        library.records = new Dictionary<string, U>();
-        library.description = ArgumentParser.TryGet("library_description", "");
-        // Get the library path.
-        string libraryPath = Path.Combine(outputDirectory.FullName, "library.json");
-        // Write the library.
-        JsonWrapper.Serialize(library, libraryPath, false);
-        // Continuously output the progress.
+        // Get a library.
+        RecordLibrary<U> library;
+        string libraryPath;
+        string libraryDescription;
+        GetLibraryInDirectory(outputDirectory, out library, out libraryPath, out libraryDescription);
         string progressPath = Path.Combine(outputDirectory.FullName, "progress.txt");
         string errorsPath = Path.Combine(outputDirectory.FullName, "errors.txt");
         bool overwrite = ArgumentParser.GetBoolean("-overwrite");
@@ -140,6 +136,32 @@ public abstract class SourceDirectoryCreator<T, U> : AssetBundleCreator<T, U>
         if (ArgumentParser.GetBoolean("-cleanup"))
         {
             PathUtil.Cleanup();
+        }
+    }
+
+
+    /// <summary>
+    /// Create or load a library file within an output directory.
+    /// </summary>
+    /// <param name="outputDirectory">The output directory.</param>
+    /// <param name="library">The library.</param>
+    /// <param name="libraryPath">The library path.</param>
+    /// <param name="libraryDescription">A description of the library.</param>
+    protected static void GetLibraryInDirectory(DirectoryInfo outputDirectory, out RecordLibrary<U> library, out string libraryPath, out string libraryDescription)
+    {
+        libraryPath = Path.Combine(outputDirectory.FullName, "library.json");
+        libraryDescription = ArgumentParser.TryGet("library_description", "");
+        // Create a new library if we have the overwrite flag or if the library doesn't exist.
+        if (ArgumentParser.GetBoolean("-overwrite") || !File.Exists(libraryPath))
+        {
+            library = new RecordLibrary<U>();
+            library.records = new Dictionary<string, U>();
+            library.description = libraryDescription;
+            JsonWrapper.Serialize(library, libraryPath, false);
+        }
+        else
+        {
+            library = JsonWrapper.Deserialize<RecordLibrary<U>>(libraryPath);
         }
     }
 }

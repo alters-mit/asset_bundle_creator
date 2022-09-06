@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Logger = Logging.Logger;
@@ -58,6 +59,103 @@ public class ModelCreator : SourceDirectoryCreator<ModelCreator, ModelRecord>
         wnid = ArgumentParser.TryGet("wnid", "");
         wcategory = ArgumentParser.TryGet("wcategory", "");
         scaleFactor = ArgumentParser.TryGet("scale_factor", 1f);
+    }
+
+
+    /// <summary>
+    /// Convert all files listed in a metadata file to asset bundles.
+    /// </summary>
+    public static void MetadataFileToAssetBundles()
+    {
+        int vhacdResolution = ArgumentParser.TryGet("vhacd_resolution", Constants.DEFAULT_VHACD_RESOLUTION);
+        bool internalMaterials = ArgumentParser.GetBoolean("-internal_materials");
+        bool cleanup = ArgumentParser.GetBoolean("-cleanup");
+        DirectoryInfo outputDirectory = new DirectoryInfo(ArgumentParser.Get("output_directory"));
+        string metadata_path = ArgumentParser.Get("metadata_path");
+        Logger.StartLogging(Path.Combine(outputDirectory.FullName, Constants.LOG_FILE_NAME));
+        // Try to find the metadata file.
+        if (!File.Exists(metadata_path))
+        {
+            Debug.LogError("File not found: " + metadata_path);
+            return;
+        }
+        string[] metadata = File.ReadAllText(metadata_path).Split('\n');
+        Debug.Log("Read: " + metadata_path);
+        // Get a library.
+        RecordLibrary<ModelRecord> library;
+        string libraryPath;
+        string libraryDescription;
+        GetLibraryInDirectory(outputDirectory, out library, out libraryPath, out libraryDescription);
+        // Continuously output the progress.
+        string progressPath = Path.Combine(outputDirectory.FullName, "progress.txt");
+        string errorsPath = Path.Combine(outputDirectory.FullName, "errors.txt");
+        bool overwrite = ArgumentParser.GetBoolean("-overwrite");
+        // Delete old progress.
+        if (overwrite)
+        {
+            if (File.Exists(progressPath))
+            {
+                File.Delete(progressPath);
+            }
+            if (File.Exists(errorsPath))
+            {
+                File.Delete(errorsPath);
+            }
+        }
+        bool continueOnError = ArgumentParser.GetBoolean("-continue_on_error");
+        // Iterate through each metadata row.
+        for (int i = 1; i < metadata.Length; i++)
+        {
+            string[] row = metadata[i].Split(',');
+            // Get the model name.
+            string name = row[0].Trim();
+            string modelOutputDirectory = Path.Combine(outputDirectory.FullName, name);
+            // Check if asset bundles exist.
+            if (!overwrite)
+            {
+                bool assetBundlesExist = true;
+                foreach (string platform in BuildTargetFolders.Values)
+                {
+                    string assetBundlePath = Path.Combine(modelOutputDirectory, platform, name);
+                    if (!File.Exists(assetBundlePath))
+                    {
+                        assetBundlesExist = false;
+                        break;
+                    }
+                }
+                // Skip this asset bundle.
+                if (assetBundlesExist)
+                {
+                    continue;
+                }
+            }
+            string path = row[4].Trim();
+            // Get a creator.
+            ModelCreator creator = new ModelCreator(name, path, modelOutputDirectory,
+                vhacdResolution, internalMaterials, row[1].Trim(), row[2].Trim(), float.Parse(row[3]));
+            bool success = creator.CreatePrefab();
+            // Something went wrong. Halt everything.
+            if (!success)
+            {
+                File.AppendAllText(errorsPath, path + "\n");
+                // Log the error.
+                if (continueOnError)
+                {
+                    continue;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            File.WriteAllText(progressPath, i + "\n" + metadata.Length + "\n" + path);
+            creator.CreateAssetBundles();
+            creator.CreateRecord(libraryPath, libraryDescription);
+            if (cleanup)
+            {
+                PathUtil.Cleanup();
+            }
+        }
     }
 
 

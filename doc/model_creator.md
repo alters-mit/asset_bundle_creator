@@ -6,14 +6,15 @@ ModelCreator accepts .fbx or .obj source files. For .obj files, it will read a .
 
 ## API Overview
 
-| Method                                               | Description                                                  |
-| ---------------------------------------------------- | ------------------------------------------------------------ |
-| `ModelCreator.SourceFileToPrefab`            | From a source .fbx or .obj file, generate a .prefab file.    |
-| `ModelCreator.PrefabToAssetBundles`          | From a .prefab file, generate asset bundles.                 |
-| `ModelCreator.CreateRecord`                  | From a .prefab as well as asset bundles, generate a metadata record. |
-| `ModelCreator.Cleanup`                       | Delete the `prefabs/` and `source_files/` directories (but not the output directory). |
-| `ModelCreator.SourceFileToAssetBundles`      | From a source .fbx or .obj file, generate a .prefab file, asset bundles, and a metata record. This is equivalent to running `SourceFileToPrefab` + `PrefabToAssetBundles` + `CreateRecord` + `Cleanup`. |
-| `ModelCreator.SourceDirectoryToAssetBundles` | Generate multiple asset bundles from a directory of source files. This is always faster than repeatedly calling `SourceFileToAssetBundles`. |
+| Method                                          | Description                                                  |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| `ModelCreator.SourceFileToPrefab`               | From a source .fbx or .obj file, generate a .prefab file.    |
+| `ModelCreator.PrefabToAssetBundles`             | From a .prefab file, generate asset bundles.                 |
+| `ModelCreator.CreateRecord`                     | From a .prefab as well as asset bundles, generate a metadata record. |
+| `ModelCreator.Cleanup`                          | Delete the `prefabs/` and `source_files/` directories (but not the output directory). |
+| `ModelCreator.SourceFileToAssetBundles`         | From a source .fbx or .obj file, generate a .prefab file, asset bundles, and a metata record. This is equivalent to running `SourceFileToPrefab` + `PrefabToAssetBundles` + `CreateRecord` + `Cleanup`. |
+| `ModelCreator.SourceDirectoryToAssetBundles`    | Generate multiple asset bundles from a directory of source files. This is always faster than repeatedly calling `SourceFileToAssetBundles`. |
+| `ModelCreator.SourceMetadataFiletoAssetBundles` | Generate multiple asset bundles from a metadata .csv file. This is similar to `SourceDirectoryToAssetBundles` but it allows you to specify metadata per file. |
 
 ## `ModelCreator.SourceFileToPrefab`
 
@@ -388,11 +389,82 @@ D:/asset_bundles
 
 ### Command-line arguments
 
+| Argument and example                         | Optional | Default  | Description                                                  |
+| -------------------------------------------- | -------- | -------- | ------------------------------------------------------------ |
+| `-source_directory="D:/models"`              |          |          | The absolute path to the root directory of the source files. |
+| `-output_directory="D:/asset_bundles"`       |          |          | The absolute path to the root output directory. If the output directory doesn't exist, it will be created. |
+| `-library_description="My metadata library"` | Yes      | `""`     | A description of the metadata library; this is written to `library.json`. |
+| `-overwrite`                                 | Yes      |          | If included, overwrite any existing asset bundles.           |
+| `-continue_on_error`                         | Yes      |          | If included, continue to generate asset bundles if there was an error with one of the source files. |
+| `-search_pattern="*.obj"`                    | Yes      | `""`     | A search pattern for how to find source files. This method will always recursively check sub-directories. |
+| `-internal_materials`                        | Yes      |          | If included, ModelCreator will assume that the source file materials are within the file. This is only evaluated if the source file(s) are .fbx files. |
+| `-vhacd_resolution=800000`                   | Yes      | `800000` | The [VHACD](https://github.com/kmammou/v-hacd) voxel resolution. A larger number will generate more precise hull mesh colliders but will run slower. The default value is usually what you'll want to use. |
+| `-cleanup`                                   | Yes      |          | If included, delete the `prefabs/` and `source_files/` directories after generating the asset bundles and the metadata record. |
+
+## `ModelCreator.MetadataFileToAssetBundles`
+
+Generate multiple asset bundles from a metadata .csv file. This is similar to `SourceDirectoryToAssetBundles` but it allows you to specify metadata per file.
+
+### Example call
+
+```powershell
+&"C:/Program Files/Unity/Hub/Editor/2020.3.24f1/Editor/Unity.exe" -projectpath "C:/Users/USER/asset_bundle_creator" -quit -batchmode -executeMethod ModelCreator.MetadataFileToAssetBundles -metadata_path="D:/models/metadata.csv" -output_directory="D:/asset_bundles"
+```
+
+### Example input and output
+
+**Example metadata file:**
+
+```
+name,wnid,wcategory,scale_factor,path
+model_0,n04148054,scissors,1,D:/models/model_0/model_0.obj
+model_1,n03056701,coaster,1,D:/models/model_1/model_1.obj
+```
+
+**Example output  in the output directory:**
+
+```
+D:/asset_bundles
+....model_0/
+........Darwin/
+............model_0
+........Linux/
+............model_0
+........Windows/
+............model_0
+........log.txt
+........record.json
+....model_1/
+........Darwin/
+............model_1
+........Linux/
+............model_1
+........Windows/
+............model_1
+........log.txt
+........record.json
+....(etc.)
+....library.json
+....progress.txt
+....errors.txt
+```
+
+- `Darwin/model_0`, `Linux/model_0`, and `Windows/model_0` are the platform-specific asset bundle files.
+- `log.txt` is a log that will tell you if the process succeeded or failed.
+- `record.json` is a JSON dictionary of the model metadata record.
+- `library.json` is an optional JSON dictionary of multiple metadata records.
+- `progress.txt` is continuously updated; read this file to check on the current progress.
+- `errors.txt` is a list of any models that couldn't be converted into asset bundles.
+
+### Command-line arguments
+
 | Argument and example                         | Optional | Default | Description                                                  |
 | -------------------------------------------- | -------- | ------- | ------------------------------------------------------------ |
-| `-source_directory="D:/models"`              |          |         | The absolute path to the root directory of the source files. |
+| `-metadata_path="D:/models/metadata.csv"`    |          |         | The path to the metadata .csv file.                          |
 | `-output_directory="D:/asset_bundles"`       |          |         | The absolute path to the root output directory. If the output directory doesn't exist, it will be created. |
 | `-library_description="My metadata library"` | Yes      | `""`    | A description of the metadata library; this is written to `library.json`. |
 | `-overwrite`                                 | Yes      |         | If included, overwrite any existing asset bundles.           |
 | `-continue_on_error`                         | Yes      |         | If included, continue to generate asset bundles if there was an error with one of the source files. |
-| `-search_pattern="*.obj"`                    | Yes      | `""`    | A search pattern for how to find source files. This method will always recursively check sub-directories. |
+| `-internal_materials`                        | Yes      |          | If included, ModelCreator will assume that the source file materials are within the file. This is only evaluated if the source file(s) are .fbx files. |
+| `-vhacd_resolution=800000`                   | Yes      | `800000` | The [VHACD](https://github.com/kmammou/v-hacd) voxel resolution. A larger number will generate more precise hull mesh colliders but will run slower. The default value is usually what you'll want to use. |
+| `-cleanup`                                   | Yes      |          | If included, delete the `prefabs/` and `source_files/` directories after generating the asset bundles and the metadata record. |
