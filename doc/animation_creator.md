@@ -1,6 +1,6 @@
 # AnimationCreator API
 
-AnimationCreator asset bundles of .anim files.
+AnimationCreator generates animation asset bundles.
 
 AnimationCreator accepts .anim and .fbx source files. If the source file is a .fbx, AnimationCreator will automatically extract the animation.
 

@@ -7,6 +7,7 @@ This repo combines several open-source tools to make it easy to import assets in
 | .fbx or .obj                                                 | A GameObject with visual meshes, hull mesh colliders, and a Rigidbody. |
 | [.urdf](http://wiki.ros.org/urdf)                            | A GameObject  with visual meshes, hull mesh colliders, and a Rigidbody, and articulated sub-objects. Each sub-object can have either a Joint component or an ArticulationBody component. |
 | .anim or .fbx                                                | A .anim file (within an asset bundle).                       |
+| .fbx                                                         | A rigged humanoid GameObject (without colliders).            |
 | [.sdf](http://sdformat.org/spec?ver=1.9&elem=sdf) or [.lisdf](https://learning-and-intelligent-systems.github.io/kitchen-worlds/tut-lisdf/) | Multiple asset bundles of non-articulated objects, articulated objects with Joint components, and articulated objects with ArticulationBody components. |
 
 ## Why you should use this software
@@ -73,6 +74,7 @@ To learn more about the available methods and their arguments, read the document
 | RobotCreator           | [.urdf](http://wiki.ros.org/urdf)                            | Generates *articulated* Unity robots. Each joint has an ArticulationBody component (*not* a Rigidbody), visual meshes, and mesh colliders. | [Read this.](doc/robot_creator.md)            |
 | CompositeObjectCreator | [.urdf](http://wiki.ros.org/urdf)                            | Generates *articulated* Unity GameObjects. Each joint has an Rigidbody component, a Joint component (e.g. a HingeJoint),  visual meshes, and mesh colliders. | [Read this.](doc/composite_object_creator.md) |
 | AnimationCreator       | .anim or .fbx                                                | Generates asset bundles of .anim files.                      | [Read this.](doc/animation_creator.md)        |
+| HumanoidCreator        | .fbx                                                         | Generates asset bundles of .fbx files.                       | [Read this.](doc/hhumanoid_creator.md)        |
 | LisdfReader            | [.sdf](http://sdformat.org/spec?ver=1.9&elem=sdf) or [.lisdf](https://learning-and-intelligent-systems.github.io/kitchen-worlds/tut-lisdf/) | Generates multiple GameObject asset bundles using a combination of RobotCreator and CompositeObjectCreator. | [Read this.](doc/lisdf_reader.md)             |
 
 ## Misc. Documentation
