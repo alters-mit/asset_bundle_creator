@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
+using UnityEngine;
 using SubalternGames;
 
 
@@ -50,7 +51,15 @@ public static class ArgumentParser
                     string flag = match.Groups[1].Value;
                     string value = match.Groups[2].Value;
                     // Remove any double quotes enclosing the argument.
-                    value = value.Replace("\\\"", "");
+                    if (Application.platform == RuntimePlatform.WindowsEditor)
+                    {
+                        value = value.Replace("\\\"", "");
+                    }
+                    else
+                    {
+                        value = value.Replace("\"", "");
+                    }
+UnityEngine.Debug.Log("ARG: " + value);
                     args.Add(flag, value);
                 }
             }
