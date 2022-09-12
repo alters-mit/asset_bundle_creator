@@ -92,7 +92,7 @@ public static class MeshConverter
         // Try to convert the file.
         else
         {
-            return Assimp(source, ".obj", out path);
+            return Assimp(source, ".fbx", out path);
         }
     }
 
