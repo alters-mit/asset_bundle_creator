@@ -28,8 +28,8 @@ public static class MeshConverter
             Debug.LogError("Error! File doesn't exist: " + source.originalPath);
             return false;
         }
-        // We don't need to do anything extra with a .fbx file. Just copy it.
-        if (source.extension == ".fbx")
+        // We don't need to do anything extra with a .fbx or .dae file. Just copy it.
+        if (source.extension == ".fbx" || source.extension == ".dae")
         {
             source.CopyToSourceFilesDirectory();
             path = source.pathInProjectAbsolute;

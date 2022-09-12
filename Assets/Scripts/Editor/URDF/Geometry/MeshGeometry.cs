@@ -72,12 +72,21 @@ namespace URDF
             GameObject go = Object.Instantiate(uri.LoadAsset());
             // Get the visuals from the file.
             GameObject[] visuals = go.GetComponentsInChildren<MeshRenderer>().Select(m => m.gameObject).ToArray();
+            bool destroy = true;
             foreach (GameObject v in visuals)
             {
                 v.transform.parent = null;
+                // The root object is one of the visible meshes.
+                if (v.Equals(go))
+                {
+                    destroy = false;
+                }
             }
             // Destroy the parent.
-            Object.DestroyImmediate(go);
+            if (destroy)
+            {
+                Object.DestroyImmediate(go);
+            }
             return visuals;
         }
 
