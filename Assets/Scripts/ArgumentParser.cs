@@ -34,7 +34,6 @@ public static class ArgumentParser
         string[] commandLineArgs = Environment.GetCommandLineArgs();
         foreach (string arg in commandLineArgs)
         {
-            Debug.Log("ARG: " + arg);
             // Check if the argument is formatted like -flag="value".
             MatchCollection matches = Regex.Matches(arg, REGEX_ARGUMENTS);
             // If the argument isn't formatted that way, assume it's a boolean flag like -flag.
@@ -52,14 +51,15 @@ public static class ArgumentParser
                     string flag = match.Groups[1].Value;
                     string value = match.Groups[2].Value;
                     // Remove any double quotes enclosing the argument.
-                    if (Application.platform == RuntimePlatform.LinuxEditor)
-                    {
-                        value = value.Replace("\"", "");
-                    }
-                    else
+                    if (Application.platform == RuntimePlatform.WindowsEditor)
                     {
                         value = value.Replace("\\\"", "");
                     }
+                    else
+                    {
+                        value = value.Replace("\"", "");
+                    }
+                    Debug.Log("FLAG: " + flag + ", VALUE: " + value);
                     args.Add(flag, value);
                 }
             }
