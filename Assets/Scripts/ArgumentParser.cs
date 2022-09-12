@@ -34,6 +34,7 @@ public static class ArgumentParser
         string[] commandLineArgs = Environment.GetCommandLineArgs();
         foreach (string arg in commandLineArgs)
         {
+            Debug.Log("ARG: " + arg);
             // Check if the argument is formatted like -flag="value".
             MatchCollection matches = Regex.Matches(arg, REGEX_ARGUMENTS);
             // If the argument isn't formatted that way, assume it's a boolean flag like -flag.
