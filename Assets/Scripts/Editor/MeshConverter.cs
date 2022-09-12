@@ -233,10 +233,9 @@ public static class MeshConverter
         wrlPath = source.GetPathInProjectAbsoluteWithNewExtension(".wrl");
         string logPath = PathUtil.GetPathFrom(Application.dataPath, "../vhacd_log.txt");
         LaunchExecutable("testVHACD", "vhacd",
-            "--input \"" + source.originalPath + "\"" +
-            " --resolution " + vhacdResolution.ToString() +
-            " --output \"" + wrlPath + "\"" +
-            " --log \"" + logPath + "\"");
+            "\"" + source.originalPath + "\"" +
+            " -r " + vhacdResolution.ToString() +
+            " -l false -o obj -a false");
         // Delete the log.
         if (File.Exists(logPath))
         {
