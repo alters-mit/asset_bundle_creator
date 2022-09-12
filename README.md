@@ -25,14 +25,13 @@ This repo combines several open-source tools to make it easy to import assets in
 ## Requirements
 
 - Windows, OS X, or Linux
-- Unity 2020.3.24
-- A valid display. On a Linux server, check your X11 settings and then export the display, e.g. `export DISPLAY=:0`.
+- Unity 2020.3.24, ideally installed via Unity Hub. To install on a Linux server, [read this.](doc/linux_server.md)
 
 ## Usage
 
 ### With ThreeDWorld (TDW)
 
-This software was originally made for [TDW](https://github.com/threedworld-mit/tdw), which includes helpful Python wrapper classes for the command-line calls. **TODO more**
+This software was originally made for [TDW](https://github.com/threedworld-mit/tdw), which includes helpful Python wrapper classes for the command-line calls.
 
 ### With Unity Editor
 
@@ -81,6 +80,7 @@ To learn more about the available methods and their arguments, read the document
 
 - [Hull Mesh Colliders](doc/hull_mesh_colliders.md)
 - [RobotCreator vs. CompositeObjectCreator](doc/robot_creator_vs_composite_object_creator.md)
+- [How to install Unity Editor on a Linux server](doc/linux_server.md)
 
 ## Roadmap
 
