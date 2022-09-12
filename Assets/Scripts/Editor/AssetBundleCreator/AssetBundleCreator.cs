@@ -325,6 +325,6 @@ public abstract class AssetBundleCreator<T, U>
     /// <param name="target">The build target.</param>
     private string GetURI(BuildTarget target)
     {
-        return Path.Combine("file:///", GetAssetBundlePath(target)).FixWindowsPath();
+        return "file:///" + GetAssetBundlePath(target).FixWindowsPath();
     }
 }
