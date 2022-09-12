@@ -25,7 +25,19 @@ This repo combines several open-source tools to make it easy to import assets in
 ## Requirements
 
 - Windows, OS X, or Linux
-- Unity 2020.3.24, ideally installed via Unity Hub. To install on a Linux server, [read this.](doc/linux_server.md)
+- Unity 2020.3.24, ideally installed via Unity Hub. 
+  - When installing, add build options for Windows, OS X, and Linux.
+
+- *Linux only:*
+  - To install on a Linux server, [read this.](doc/linux_server.md)
+  - libgconf-2-4
+  - From the ubuntu-toolchain ppa (`sudo add-apt-repository ppa:ubuntu-toolchain-r/test`):
+    - gcc-9
+    - libstdc++6
+
+- *Windows only*:
+  - Visual C++ 2012 Redistributable
+
 
 ## Usage
 
