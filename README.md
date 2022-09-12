@@ -30,10 +30,13 @@ This repo combines several open-source tools to make it easy to import assets in
 
 - *Linux only:*
   - To install on a Linux server, [read this.](doc/linux_server.md)
-  - libgconf-2-4
+  - libgconf-2-4 (`sudo apt install libgconf-2-4`)
   - From the ubuntu-toolchain ppa (`sudo add-apt-repository ppa:ubuntu-toolchain-r/test`):
-    - gcc-9
-    - libstdc++6
+    - gcc-9 (`sudo apt install gcc-9`)
+    - libstdc++6 (`sudo apt install libstdc++6`)
+
+- *OS X only:*
+  - assimp (`brew install assimp`)
 
 - *Windows only*:
   - Visual C++ 2012 Redistributable
