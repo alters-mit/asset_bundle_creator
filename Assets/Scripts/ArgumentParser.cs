@@ -51,15 +51,14 @@ public static class ArgumentParser
                     string flag = match.Groups[1].Value;
                     string value = match.Groups[2].Value;
                     // Remove any double quotes enclosing the argument.
-                    if (Application.platform == RuntimePlatform.WindowsEditor)
-                    {
-                        value = value.Replace("\\\"", "");
-                    }
-                    else
+                    if (Application.platform == RuntimePlatform.LinuxEditor)
                     {
                         value = value.Replace("\"", "");
                     }
-UnityEngine.Debug.Log("ARG: " + value);
+                    else
+                    {
+                        value = value.Replace("\\\"", "");
+                    }
                     args.Add(flag, value);
                 }
             }
