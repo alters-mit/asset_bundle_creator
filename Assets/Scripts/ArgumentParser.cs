@@ -59,7 +59,6 @@ public static class ArgumentParser
                     {
                         value = value.Replace("\"", "");
                     }
-                    Debug.Log("FLAG: " + flag + ", VALUE: " + value);
                     args.Add(flag, value);
                 }
             }
