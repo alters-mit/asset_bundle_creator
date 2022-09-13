@@ -80,7 +80,7 @@ public class RobotCreator : AssetBundleCreator<RobotCreator, RobotRecord>
             GameObject linkObject = new GameObject(link.name);
             Debug.Log("Created: " + link.name);
             // Add visuals and colliders.
-            if (!link.AddVisualsAndColliders(ref linkObject, source, robot.materials, robot.meshRotation))
+            if (!link.AddVisualsAndColliders(ref linkObject, source, robot.materials, robot.visualMeshRotation, robot.colliderMeshRotation))
             {
                 return false;
             }

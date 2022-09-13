@@ -1,5 +1,6 @@
 using System.Xml.Linq;
 using System.Linq;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -93,14 +94,20 @@ namespace URDF
 
         public override bool GetColliders(out GameObject[] colliders)
         {
-            string path;
-            if (!MeshConverter.CreateHullCollidersMesh(uri, Constants.DEFAULT_VHACD_RESOLUTION, scale, out path))
+            string[] paths;
+            if (!MeshConverter.CreateHullCollidersMesh(uri, Constants.DEFAULT_VHACD_RESOLUTION, scale, out paths))
             {
                 colliders = null;
                 return false;
             }
-            uri = new SourceFile(Path.GetFileNameWithoutExtension(path), path, uri.folderNameInProject);
-            colliders = MeshConverter.GetColliders(uri, scale);
+            List<GameObject> collidersList = new List<GameObject>();
+            int count = 0;
+            foreach (string path in paths)
+            {
+                uri = new SourceFile(Path.GetFileNameWithoutExtension(path), path, uri.folderNameInProject);
+                collidersList.AddRange(MeshConverter.GetColliders(new string[] { uri.pathInProjectAbsolute }, ref count, scale));
+            }
+            colliders = collidersList.ToArray();
             return true;
         }
     }

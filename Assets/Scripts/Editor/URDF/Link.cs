@@ -73,8 +73,9 @@ namespace URDF
         /// </summary>
         /// <param name="go">The parent GameObject.</param>
         /// <param name="materials">A dictionary of top-level materials. Key = The name of the material.</param>
-        /// <param name="meshRotation">A quaternion for correcting the rotation.</param>
-        public bool AddVisualsAndColliders(ref GameObject go, SourceFile source, Dictionary<string, UrdfMaterial> materials, Quaternion meshRotation)
+        /// <param name="visualMeshRotation">A quaternion for correcting the visual mesh rotation.</param>
+        /// <param name="colliderMeshRotation">A quaternion for correcting the collider mesh rotation.</param>
+        public bool AddVisualsAndColliders(ref GameObject go, SourceFile source, Dictionary<string, UrdfMaterial> materials, Quaternion visualMeshRotation, Quaternion colliderMeshRotation)
         {
             GameObject visualsParent = new GameObject("visuals");
             visualsParent.ParentAtZero(go);
@@ -86,7 +87,7 @@ namespace URDF
                 GameObject[] vs = visual.geometry.GetVisuals();
                 foreach (GameObject v in vs)
                 {
-                    SetChildTransform(visualsParent, v, visual, meshRotation);
+                    SetChildTransform(visualsParent, v, visual, visualMeshRotation);
                 }
                 // Apply a material.
                 if (visual.material != null)
@@ -110,7 +111,7 @@ namespace URDF
                 }
                 foreach (GameObject c in cs)
                 {
-                    SetChildTransform(collidersParent, c, visual, meshRotation);
+                    SetChildTransform(collidersParent, c, visual, colliderMeshRotation);
                 }
             }
             return true;

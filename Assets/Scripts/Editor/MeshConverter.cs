@@ -104,18 +104,12 @@ public static class MeshConverter
     /// <param name="vhacdResolution">The VHACD resoution.</param>
     /// <param name="path">The path to the .obj hull colliders file.</param>
     /// <param name="scale">The mesh scale.</param>
-    public static bool CreateHullCollidersMesh(SourceFile source, int vhacdResolution, float scale, out string path)
+    public static bool CreateHullCollidersMesh(SourceFile source, int vhacdResolution, float scale, out string[] hullColliderPaths)
     {
         Debug.Log("Trying to get or create a collider mesh file.");
-        path = source.GetPathInProjectAbsoluteWithNewName(source.filenameNoExtension + "_colliders.obj");
-        if (File.Exists(path))
-        {
-            Debug.Log("Mesh file already exists: " + path);
-            return true;
-        }
         if (!File.Exists(source.originalPath))
         {
-            path = "";
+            hullColliderPaths = new string[0];
             Debug.LogError("Error! Mesh file doesn't exist: " + source.originalPath);
             return false;
         }
@@ -126,6 +120,7 @@ public static class MeshConverter
             Debug.Log("Source file is a: " + source.extension + "... Converting now to a .obj...");
             if (!Assimp(source, ".obj", out objPath))
             {
+                hullColliderPaths = new string[0];
                 return false;
             }
         }
@@ -134,40 +129,36 @@ public static class MeshConverter
             // Copy the .obj file.
             objPath = source.pathInProjectAbsolute;
             source.CopyToSourceFilesDirectory();
+            hullColliderPaths = new string[] { source.pathInProjectAbsolute };
         }
-        // Try to create a .wrl file.
-        string wrlPath;
-        if (VHACD(new SourceFile(source.filenameNoExtension, objPath, source.folderNameInProject), vhacdResolution, out wrlPath))
+        // Try to create a decomp.obj file.
+        if (!VHACD(new SourceFile(source.filenameNoExtension, objPath, source.folderNameInProject), vhacdResolution, out hullColliderPaths))
         {
-            if (!MeshConv(wrlPath, source.filenameNoExtension + "_colliders", source.folderNameInProject, out path))
-            {
-                return false;
-            }
+            Debug.Log("Error! Failed to create hull colliders.");
+            SourceFile objSource = new SourceFile(source.name, objPath, source.folderNameInProject);
+            objSource.CopyToSourceFilesDirectory();
+            hullColliderPaths = new string[] { objSource.pathInProjectAbsolute };
         }
-        else
+        // Set the import options for each hull collider.
+        for (int i = 0; i < hullColliderPaths.Length; i++)
         {
-            Debug.Log("Error! Failed to create .wrl.");
-            File.Copy(objPath, path);
-            Debug.Log("Fallback because VHACD failed to create a .wrl: Copied " + objPath + " to " + path);
+            SourceFile collidersSource = new SourceFile(Path.GetFileNameWithoutExtension(hullColliderPaths[i]), hullColliderPaths[i], source.folderNameInProject);
+            AssetDatabase.Refresh();
+            AssetPostprocessor a = new AssetPostprocessor();
+            a.assetPath = collidersSource.pathInProjectFromAssets;
+            ModelImporter mi = (ModelImporter)a.assetImporter;
+            // Re-calculate normals.
+            mi.importNormals = ModelImporterNormals.Calculate;
+            mi.isReadable = true;
+            mi.useFileScale = false;
+            mi.globalScale = scale;
+            // Apply the changes.
+            AssetDatabase.ImportAsset(a.assetPath);
+            AssetDatabase.Refresh();
+            // Test the .obj file for unhandled PhysX errors. Fix any problems by removing .obj groups.
+            HullCollidersObjFixer fixer = new HullCollidersObjFixer(collidersSource);
+            fixer.Fix();
         }
-        // Set the import options.
-        SourceFile collidersSource = new SourceFile(Path.GetFileNameWithoutExtension(path), path, source.folderNameInProject);
-        AssetDatabase.Refresh();
-        AssetPostprocessor a = new AssetPostprocessor();
-        a.assetPath = collidersSource.pathInProjectFromAssets;
-        ModelImporter mi = (ModelImporter)a.assetImporter;
-        // Re-calculate normals.
-        mi.importNormals = ModelImporterNormals.Calculate;
-        mi.isReadable = true;
-        mi.useFileScale = false;
-        mi.globalScale = scale;
-        Debug.Log("Mesh scale: " + scale);
-        // Apply the changes.
-        AssetDatabase.ImportAsset(a.assetPath);
-        AssetDatabase.Refresh();
-        // Test the .obj file for unhandled PhysX errors. Fix any problems by removing .obj groups.
-        HullCollidersObjFixer fixer = new HullCollidersObjFixer(collidersSource);
-        fixer.Fix();
         return true;
     }
 
@@ -175,18 +166,25 @@ public static class MeshConverter
     /// <summary>
     /// Create a hull colliders GameObject.
     /// </summary>
-    /// <param name="source">The colliders .obj file.</param>
     /// <param name="scale">The mesh scale.</param>
-    public static GameObject[] GetColliders(SourceFile source, float scale = 1)
+    /// <param name="paths">The paths to the .obj hull collider files.</param>
+    /// <param name="count">The collider counter.</param>
+    public static GameObject[] GetColliders(string[] paths, ref int count, float scale = 1)
     {
-        Mesh[] meshes = GetMeshes(source);
+        List<Mesh> meshes = new List<Mesh>();
+        foreach (string path in paths)
+        {
+            string pathFromAssets = "Assets" + Regex.Split(path, "Assets")[1];
+            meshes.AddRange(AssetDatabase.LoadAssetAtPath<GameObject>(pathFromAssets).GetComponentsInChildren<MeshFilter>().Select(m => m.sharedMesh));
+        }
         List<GameObject> colliders = new List<GameObject>();
         // Duplicate each child object of the .obj to the generated hulls object.
-        for (int i = 0; i < meshes.Length; i++)
+        for (int i = 0; i < meshes.Count; i++)
         {
             // Create a new child object and parent it to the generated hulls object.
             GameObject c = new GameObject();
-            c.name = "collider_" + i;
+            c.name = "collider_" + count;
+            count++;
             // Add a MeshCollider and apply the mesh.
             MeshCollider mc = c.AddComponent<MeshCollider>();
             mc.convex = true;
@@ -199,16 +197,6 @@ public static class MeshConverter
 
 
     /// <summary>
-    /// Returns the meshes from the object's MeshFilter components.
-    /// </summary>
-    /// <param name="source">The source.</param>
-    public static Mesh[] GetMeshes(SourceFile source)
-    {
-        return source.LoadAsset().GetComponentsInChildren<MeshFilter>().Select(m => m.sharedMesh).ToArray();
-    }
-
-
-    /// <summary>
     /// Launch assimp to convert a .fbx file to a .obj file.
     /// </summary>
     /// <param name="source">The path to the source file.</param>
@@ -216,8 +204,12 @@ public static class MeshConverter
     /// <param name="path">The path to the output file.</param>
     private static bool Assimp(SourceFile source, string outputExtension, out string path)
     {
+        string output;
         path = source.GetPathInProjectAbsoluteWithNewExtension(outputExtension);
-        LaunchExecutable("assimp", "assimp", "export \"" + source.originalPath + "\" \"" + path + "\"");
+        LaunchExecutable("assimp", "assimp",
+            "export \"" + source.originalPath + "\" \"" + path + "\"",
+            false,
+            out output);
         return FileExists(path);
     }
 
@@ -227,35 +219,43 @@ public static class MeshConverter
     /// </summary>
     /// <param name="source">The path to the .obj source file.</param>
     /// <param name="vhacdResolution">The voxel resolution.</param>
-    /// <param name="wrlPath">The path to the .wrl output file.</param>
-    private static bool VHACD(SourceFile source, int vhacdResolution, out string wrlPath)
+    /// <param name="objPaths">The paths to the .obj hull colliderfiles.</param>
+    private static bool VHACD(SourceFile source, int vhacdResolution, out string[] objPaths)
     {
-        wrlPath = source.GetPathInProjectAbsoluteWithNewExtension(".wrl");
-        string logPath = PathUtil.GetPathFrom(Application.dataPath, "../vhacd_log.txt");
+        string output;
+        // Get the path to the VHACD log file.
+        // Set the source file. Set the voxel resolution. Set obj as the export file type. Disable async. Disable logging.
         LaunchExecutable("testVHACD", "vhacd",
             "\"" + source.originalPath + "\"" +
             " -r " + vhacdResolution.ToString() +
-            " -l false -o obj -a false");
-        // Delete the log.
-        if (File.Exists(logPath))
+            " -o obj -a false",
+            true,
+            out output);
+        // Delete the decomp files.
+        string decompStlPath = Path.Combine(GetExecutableDirectory("vhacd"), "decomp.stl");
+        if (File.Exists(decompStlPath))
         {
-            File.Delete(logPath);
+            File.Delete(decompStlPath);
         }
-        return FileExists(wrlPath);
-    }
-
-
-    /// <summary>
-    /// Launch meshconv to convert a .wrl file to a .obj file.
-    /// </summary>
-    /// <param name="wrlPath">The path to the .wrl source file.</param>
-    /// <param name="objFilename">The name of the output file including the .obj extension.</param>
-    /// <param name="objPath">The path to the .obj output file.</param>
-    private static bool MeshConv(string wrlPath, string objFilename, string folderName, out string objPath)
-    {
-        LaunchExecutable("meshconv", "meshconv", "\"" + wrlPath + "\"" + " -c obj -o \"" + PathUtil.GetPathInUnityProjectAbsolute(Path.GetFileNameWithoutExtension(objFilename), folderName) + "\" -sg");
-        objPath = PathUtil.GetPathInUnityProjectAbsolute(objFilename + ".obj", folderName);
-        return FileExists(objPath);
+        string decompObjPath = Path.Combine(GetExecutableDirectory("vhacd"), "decomp.obj");
+        if (File.Exists(decompObjPath))
+        {
+            File.Delete(decompObjPath);
+        }
+        // Get the paths of each hull mesh.
+        MatchCollection matches = Regex.Matches(output, "Saving:(.*)");
+        objPaths = new string[matches.Count];
+        if (matches.Count == 0)
+        {
+            Debug.LogError("Failed to create hull colliders!");
+            return false;
+        }
+        for (int i = 0; i < objPaths.Length; i++)
+        {
+            objPaths[i] = matches[i].Groups[1].Value.Trim();
+        }
+        AssetDatabase.Refresh();
+        return true;
     }
 
 
@@ -265,23 +265,14 @@ public static class MeshConverter
     /// <param name="executableName">The executable name.</param>
     /// <param name="folderName">The name of the folder sub-directory.</param>
     /// <param name="arguments">Command line arguments.</param>
-    private static void LaunchExecutable(string executableName, string folderName, string arguments)
+    /// <param name="stdout">If true, redirect stdout.</param>
+    /// <param name="output">The output from stdout.</param>
+    private static void LaunchExecutable(string executableName, string folderName, string arguments, bool stdout, out string output)
     {
-        string os;
+        // Get the path to the executable.
+        string path = Path.Combine(GetExecutableDirectory(folderName), executableName);
+        // Add a file extension.
         if (Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            os = "Windows";
-        }
-        else if (Application.platform == RuntimePlatform.OSXEditor)
-        {
-            os = "Darwin";
-        }
-        else
-        {
-            os = "Linux";
-        }
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "executables", os, folderName, executableName);
-        if (os == "Windows")
         {
             path += ".exe";
         }
@@ -289,10 +280,26 @@ public static class MeshConverter
         process.StartInfo.FileName = path;
         process.StartInfo.WorkingDirectory = Path.GetDirectoryName(path);
         process.StartInfo.Arguments = arguments;
-        process.StartInfo.UseShellExecute = true;
-        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        process.StartInfo.UseShellExecute = !stdout;
+        process.StartInfo.RedirectStandardOutput = stdout;
+        if (stdout)
+        {
+            process.StartInfo.CreateNoWindow = true;
+        }
+        else
+        {
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        }
         process.Start();
         Debug.Log("Launched: " + path + " " + arguments);
+        if (stdout)
+        {
+            output = process.StandardOutput.ReadToEnd();
+        }
+        else
+        {
+            output = "";
+        }
         process.WaitForExit();
         Debug.Log("Done!");
     }
@@ -315,5 +322,28 @@ public static class MeshConverter
             Debug.LogError("Error! Failed to create: " + path);
             return false;
         }
+    }
+
+
+    /// <summary>
+    /// Returns the path to the executable's directory.
+    /// </summary>
+    /// <param name="folderName">The executable's folder.</param>
+    private static string GetExecutableDirectory(string folderName)
+    {
+        string os;
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            os = "Windows";
+        }
+        else if (Application.platform == RuntimePlatform.OSXEditor)
+        {
+            os = "Darwin";
+        }
+        else
+        {
+            os = "Linux";
+        }
+        return Path.Combine(Directory.GetCurrentDirectory(), "executables", os, folderName);
     }
 }

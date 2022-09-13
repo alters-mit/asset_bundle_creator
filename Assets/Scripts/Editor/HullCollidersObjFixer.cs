@@ -44,8 +44,9 @@ public class HullCollidersObjFixer
             }
             // Enable logging.
             Application.logMessageReceived += HandleLog;
+            int count = 0;
             // Get the colliders.
-            GameObject[] colliders = MeshConverter.GetColliders(source);
+            GameObject[] colliders = MeshConverter.GetColliders(new string[] { source.pathInProjectAbsolute }, ref count);
             // Stop logging.
             Application.logMessageReceived -= HandleLog;
             // Destroy the colliders.
