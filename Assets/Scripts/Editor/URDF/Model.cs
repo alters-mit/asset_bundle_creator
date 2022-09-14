@@ -38,15 +38,23 @@ namespace URDF
         /// </summary>
         public Dictionary<string, UrdfMaterial> materials;
         /// <summary>
-        /// The rotation for the visuals and collisions.
+        /// The rotation for the visuals.
         /// </summary>
-        public Quaternion meshRotation;
+        public Quaternion visualMeshRotation;
+        /// <summary>
+        /// The rotation for the colliders.
+        /// </summary>
+        public Quaternion colliderMeshRotation;
         /// <summary>
         /// The mesh rotation in ROS coordinate space.
         /// https://github.com/Unity-Technologies/URDF-Importer/blob/main/com.unity.robotics.urdf-importer/Runtime/Extensions/UrdfRobotExtensions.cs
         /// </summary>
         [JsonIgnore]
-        private readonly static Quaternion RosMeshRotation = Quaternion.Euler(-90, 0, 90);
+        private readonly static Quaternion RosVisualMeshRotation = Quaternion.Euler(-90, 0, 90);
+        /// <summary>
+        /// The mesh rotation for ROS colliders.
+        /// </summary>
+        private readonly static Quaternion RosColliderMeshRotation = Quaternion.Euler(0, 90, 0);
         /// <summary>
         /// The mesh rotation in PartNet Mobility coordinate space.
         /// </summary>
@@ -116,15 +124,18 @@ namespace URDF
             // Set the mesh rotation.
             if (coordinateSpace == CoordinateSpace.unity)
             {
-                meshRotation = Quaternion.identity;
+                visualMeshRotation = Quaternion.identity;
+                colliderMeshRotation = Quaternion.identity;
             }
             else if (coordinateSpace == CoordinateSpace.partnet_mobility)
             {
-                meshRotation = PartNetMobilityRotation;
+                visualMeshRotation = PartNetMobilityRotation;
+                colliderMeshRotation = PartNetMobilityRotation;
             }
             else if (coordinateSpace == CoordinateSpace.ros)
             {
-                meshRotation = RosMeshRotation;
+                visualMeshRotation = RosVisualMeshRotation;
+                colliderMeshRotation = RosColliderMeshRotation;
             }
             else
             {

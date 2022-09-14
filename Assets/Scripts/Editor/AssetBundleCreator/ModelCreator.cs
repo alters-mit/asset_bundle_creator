@@ -173,13 +173,12 @@ public class ModelCreator : SourceDirectoryCreator<ModelCreator, ModelRecord>
         // Set the import options.
         bool readable = visualFile.LoadAsset().transform.childCount == 0;
         SetObjImportOptions(visualFile, false, true, internalMaterials, readable, 1);
-        // Get a .obj file to use with VHACD.
-        string colliderPath;
-        if (!MeshConverter.CreateHullCollidersMesh(source, vhacdResolution, 1, out colliderPath))
+        // Create hull mesh collider files.
+        string[] hullColliderPaths;
+        if (!MeshConverter.CreateHullCollidersMesh(source, vhacdResolution, 1, out hullColliderPaths))
         {
             return false;
         }
-        SourceFile colliderFile = new SourceFile(source.name, colliderPath, source.name);
         // Load the object again.
         GameObject go = Object.Instantiate(visualFile.LoadAsset());
         if (go == null)
@@ -194,7 +193,8 @@ public class ModelCreator : SourceDirectoryCreator<ModelCreator, ModelRecord>
         go.DestroyAll<Light>();
         Debug.Log("Created GameObject " + go);
         // Create the hull colliders object.
-        GameObject[] colliders = MeshConverter.GetColliders(colliderFile, 1);
+        int count = 0;
+        GameObject[] colliders = MeshConverter.GetColliders(hullColliderPaths, ref count, 1);
         GameObject collidersParent = new GameObject();
         collidersParent.name = "Generated Colliders";
         foreach (GameObject c in colliders)

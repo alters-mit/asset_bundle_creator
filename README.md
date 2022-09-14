@@ -96,6 +96,7 @@ To learn more about the available methods and their arguments, read the document
 - [Hull Mesh Colliders](doc/hull_mesh_colliders.md)
 - [RobotCreator vs. CompositeObjectCreator](doc/robot_creator_vs_composite_object_creator.md)
 - [How to install Unity Editor on a Linux server](doc/linux_server.md)
+- [Troubleshooting](doc/troubleshooting.md)
 
 ## Roadmap
 

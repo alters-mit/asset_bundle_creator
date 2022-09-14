@@ -113,7 +113,7 @@ public class CompositeObjectCreator : AssetBundleCreator<CompositeObjectCreator,
             GameObject linkObject = new GameObject(link.name);
             Debug.Log("Created link: " + link.name);
             // Add visuals and colliders.
-            if (!link.AddVisualsAndColliders(ref linkObject, source, model.materials, model.meshRotation))
+            if (!link.AddVisualsAndColliders(ref linkObject, source, model.materials, model.visualMeshRotation, model.colliderMeshRotation))
             {
                 Debug.Log("Error adding visuals or colliders.");
                 return false;
