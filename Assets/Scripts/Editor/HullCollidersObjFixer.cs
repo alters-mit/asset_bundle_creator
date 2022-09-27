@@ -77,10 +77,19 @@ public class HullCollidersObjFixer
                     {
                         string group = match.Groups[1].Value;
                         // Remove the .obj group.
-                        objText = Regex.Replace(objText, "(" + group + @"$((.|\n)*?))(g|\Z)", "g", RegexOptions.Multiline);
+                        string newText = Regex.Replace(objText, "(" + group + @"$((.|\n)*?))(g|\Z)", "g", RegexOptions.Multiline);
                         // Remove a trailing g if at the end of the file.
-                        objText = Regex.Replace(objText, "g$", "", RegexOptions.Multiline);
-                        Debug.Log("Removed from the .obj file: " + group);
+                        newText = Regex.Replace(objText, "g$", "", RegexOptions.Multiline);
+                        if (newText != objText)
+                        {
+                            objText = newText;
+                            Debug.Log("Removed from the .obj file: " + group);
+                        }
+                        // Failed to make any changes.
+                        else
+                        {
+                            iterations = 2000;
+                        }
                     }
                     // Write the text.
                     File.WriteAllText(source.pathInProjectAbsolute, objText);
