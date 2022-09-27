@@ -30,7 +30,7 @@ public class HullCollidersObjFixer
     /// <summary>
     /// Fix the .obj file by repeatedly trying to create mesh colliders and then checking the log for errors.
     /// </summary>
-    public void Fix()
+    public bool Fix()
     {
         bool ok = false;
         Debug.Log("Testing hull colliders file: " + source.pathInProjectAbsolute);
@@ -93,13 +93,14 @@ public class HullCollidersObjFixer
         }
         if (!ok)
         {
-            throw new System.Exception("Failed to fix: " + source.pathInProjectAbsolute);
+            Debug.LogWarning("Warning! Failed to fix: " + source.pathInProjectAbsolute);
         }
         // Delete the log.
         if (File.Exists(logPath))
         {
             File.Delete(logPath);
         }
+        return ok;
     }
 
 

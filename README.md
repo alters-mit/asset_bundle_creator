@@ -92,6 +92,7 @@ This software was originally made for [TDW](https://github.com/threedworld-mit/t
 
 ## Misc. Documentation
 
+- [Changelog](doc/changelog.md)
 - [Hull Mesh Colliders](doc/hull_mesh_colliders.md)
 - [RobotCreator vs. CompositeObjectCreator](doc/robot_creator_vs_composite_object_creator.md)
 - [How to install Unity Editor on a Linux server](doc/linux_server.md)

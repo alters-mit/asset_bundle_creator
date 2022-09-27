@@ -139,6 +139,8 @@ public static class MeshConverter
             objSource.CopyToSourceFilesDirectory();
             hullColliderPaths = new string[] { objSource.pathInProjectAbsolute };
         }
+        // These files are bad and will be ignored.
+        List<string> badHullColliderPaths = new List<string>();
         // Set the import options for each hull collider.
         for (int i = 0; i < hullColliderPaths.Length; i++)
         {
@@ -157,8 +159,13 @@ public static class MeshConverter
             AssetDatabase.Refresh();
             // Test the .obj file for unhandled PhysX errors. Fix any problems by removing .obj groups.
             HullCollidersObjFixer fixer = new HullCollidersObjFixer(collidersSource);
-            fixer.Fix();
+            if (!fixer.Fix())
+            {
+                badHullColliderPaths.Add(hullColliderPaths[i]);
+            }
         }
+        // Remove the bad paths.
+        hullColliderPaths = hullColliderPaths.Where(hcp => !badHullColliderPaths.Contains(hcp)).ToArray();
         return true;
     }
 
