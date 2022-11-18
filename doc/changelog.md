@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.3
+
+- Fixed: assimp on OSX doesn't have an executable flag.
+
 ## 2.0.2
 
 - Fixed: Thousands of redundant calls to `HullCollidersFixer.CreateHullCollidersMesh()` if the .obj file doesn't have sub-meshes.
