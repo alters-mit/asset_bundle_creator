@@ -31,7 +31,7 @@ namespace URDF
         {
             // Get the name.
             XAttribute nameAttribute = element.Attribute("name");
-            if (nameAttribute != null)
+            if (nameAttribute != null && nameAttribute.Value != "")
             {
                 name = nameAttribute.Value;
             }

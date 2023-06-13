@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.3
+
+- Fixed: Error if a URDF material name string is empty.
+
 ## 2.0.2
 
 - Fixed: Thousands of redundant calls to `HullCollidersFixer.CreateHullCollidersMesh()` if the .obj file doesn't have sub-meshes.
