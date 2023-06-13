@@ -1,8 +1,12 @@
 # Changelog
 
-## 2.0.3
+## 2.0.4
 
 - Fixed: Error if a URDF material name string is empty.
+
+## 2.0.3
+
+- Fixed: assimp on OSX doesn't have an executable flag.
 
 ## 2.0.2
 
