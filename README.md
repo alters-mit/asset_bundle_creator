@@ -22,7 +22,7 @@ There are two caveats:
 ## Requirements
 
 - Windows, OS X, or Linux
-- Unity 2020.3.24, ideally installed via Unity Hub. 
+- Unity 2020.3.48, ideally installed via Unity Hub. 
   - When installing, add build options for Windows, OS X, and Linux.
 - *Linux only:*
   - To install on a Linux server, [read this.](doc/linux_server.md)
