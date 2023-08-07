@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5
+
+- Upgraded to Unity 2020.3.48
+
 ## 2.0.4
 
 - Fixed: Error if a URDF material name string is empty.
