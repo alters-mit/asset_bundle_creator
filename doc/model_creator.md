@@ -74,7 +74,7 @@ D:/asset_bundles
 
 | Argument and example                         | Optional | Default  | Description                                                  |
 | -------------------------------------------- | -------- | -------- | ------------------------------------------------------------ |
-| `-name="model"`                              |          |          | The name of the generated prefab and asset bundles.                     |
+| `-name="model"`                              |          |          | The name of the generated prefab and asset bundles.          |
 | `-source="D:/models/model.obj"`              |          |          | The absolute path to the source file.                        |
 | `-output_directory="D:/asset_bundles/model"` |          |          | The absolute path to the output directory. If the output directory doesn't exist, it will be created. |
 | `-vhacd_resolution=800000`                   | Yes      | `800000` | The [VHACD](https://github.com/kmammou/v-hacd) voxel resolution. A larger number will generate more precise hull mesh colliders but will run slower. The default value is usually what you'll want to use. |
@@ -131,6 +131,7 @@ D:/asset_bundles
 | `-name="model"`                              |          |         | The name of the generated asset bundles.                     |
 | `-source="dummy"`                            |          |         | The absolute path to the source file. This isn't actually used in this method and can be set to something non-existent like `"dummy"`. |
 | `-output_directory="D:/asset_bundles/model"` |          |         | The absolute path to the output directory. If the output directory doesn't exist, it will be created |
+| `-linux`, `-osx`, `-windows`, `-webgl`       | Yes      |          | If you add any of these flags, ModelCreator will create asset bundles for only the specified targets. You can add more than one of these flags. If you don't include any of these flags, ModelCreator defaults to making asset bundles for Linux, OSX, and Windows. |
 
 ## `ModelCreator.CreateRecord`
 
@@ -314,6 +315,7 @@ D:/asset_bundles
 | `-library_path="D:/asset_bundles/library.json"` | Yes      | `""`     | If included, this will generate a `library.json` file, a dictionary of multiple records. The data in `record.json` will be included within `library.json`. |
 | `-library_description="My metadata library"`    | Yes      | `""`     | A description of the metadata library; this is written to `library.json`. |
 | `-cleanup`                                      | Yes      |          | If included, delete the `prefabs/` and `source_files/` directories after generating the asset bundles and the metadata record. |
+| `-linux`, `-osx`, `-windows`, `-webgl`       | Yes      |          | If you add any of these flags, ModelCreator will create asset bundles for only the specified targets. You can add more than one of these flags. If you don't include any of these flags, ModelCreator defaults to making asset bundles for Linux, OSX, and Windows. |
 
 ## `ModelCreator.SourceDirectoryToAssetBundles`
 
@@ -400,6 +402,7 @@ D:/asset_bundles
 | `-internal_materials`                        | Yes      |          | If included, ModelCreator will assume that the source file materials are within the file. This is only evaluated if the source file(s) are .fbx files. |
 | `-vhacd_resolution=800000`                   | Yes      | `800000` | The [VHACD](https://github.com/kmammou/v-hacd) voxel resolution. A larger number will generate more precise hull mesh colliders but will run slower. The default value is usually what you'll want to use. |
 | `-cleanup`                                   | Yes      |          | If included, delete the `prefabs/` and `source_files/` directories after generating the asset bundles and the metadata record. |
+| `-linux`, `-osx`, `-windows`, `-webgl`       | Yes      |          | If you add any of these flags, ModelCreator will create asset bundles for only the specified targets. You can add more than one of these flags. If you don't include any of these flags, ModelCreator defaults to making asset bundles for Linux, OSX, and Windows. |
 
 ## `ModelCreator.MetadataFileToAssetBundles`
 
@@ -468,3 +471,4 @@ D:/asset_bundles
 | `-internal_materials`                        | Yes      |          | If included, ModelCreator will assume that the source file materials are within the file. This is only evaluated if the source file(s) are .fbx files. |
 | `-vhacd_resolution=800000`                   | Yes      | `800000` | The [VHACD](https://github.com/kmammou/v-hacd) voxel resolution. A larger number will generate more precise hull mesh colliders but will run slower. The default value is usually what you'll want to use. |
 | `-cleanup`                                   | Yes      |          | If included, delete the `prefabs/` and `source_files/` directories after generating the asset bundles and the metadata record. |
+| `-linux`, `-osx`, `-windows`, `-webgl`       | Yes      |          | If you add any of these flags, ModelCreator will create asset bundles for only the specified targets. You can add more than one of these flags. If you don't include any of these flags, ModelCreator defaults to making asset bundles for Linux, OSX, and Windows. |

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.6
+
+- Downgraded to Unity 2020.3.24 to align it with TDW's version.
+- Added optional flags to manually set build targets: `-linux`, `-osx`, `-windows`, and `-webgl`. By default, Asset Bundle Creator still creates asset bundles for Linux, OSX, and Windows.
+
 ## 2.0.5
 
 - Upgraded to Unity 2020.3.48

@@ -67,6 +67,7 @@ D:/asset_bundles
 | `-name="animation"`                               |          |         | The name of the generated asset bundles.                     |
 | `-source="D:/animations/animation.anim"`          |          |         | The absolute path to the source file.                        |
 | `-output_directory="D:/asset_bundles/animations"` |          |         | The absolute path to the output directory. If the output directory doesn't exist, it will be created |
+| `-linux`, `-osx`, `-windows`, `-webgl`       | Yes      |          | If you add any of these flags, ModelCreator will create asset bundles for only the specified targets. You can add more than one of these flags. If you don't include any of these flags, ModelCreator defaults to making asset bundles for Linux, OSX, and Windows. |
 
 ## `AnimationCreator.SourceDirectoryToAssetBundles`
 
@@ -132,3 +133,4 @@ D:/asset_bundles
 | `-overwrite`                                 | Yes      |         | If included, overwrite any existing asset bundles.           |
 | `-continue_on_error`                         | Yes      |         | If included, continue to generate asset bundles if there was an error with one of the source files. |
 | `-search_pattern="*.anim"`                   | Yes      | `""`    | A search pattern for how to find source files. This method will always recursively check sub-directories. |
+| `-linux`, `-osx`, `-windows`, `-webgl`       | Yes      |          | If you add any of these flags, ModelCreator will create asset bundles for only the specified targets. You can add more than one of these flags. If you don't include any of these flags, ModelCreator defaults to making asset bundles for Linux, OSX, and Windows. |

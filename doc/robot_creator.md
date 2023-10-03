@@ -155,6 +155,7 @@ D:/asset_bundles
 | `-name="ur5"`                              |          |         | The name of the generated asset bundles.                     |
 | `-source="dummy"`                          |          |         | The absolute path to the source file. This isn't actually used in this method and can be set to something non-existent like `"dummy"`. |
 | `-output_directory="D:/asset_bundles/ur5"` |          |         | The absolute path to the output directory. If the output directory doesn't exist, it will be created |
+| `-linux`, `-osx`, `-windows`, `-webgl`       | Yes      |          | If you add any of these flags, ModelCreator will create asset bundles for only the specified targets. You can add more than one of these flags. If you don't include any of these flags, ModelCreator defaults to making asset bundles for Linux, OSX, and Windows. |
 
 ## `RobotCreator.CreateRecord`
 
@@ -352,3 +353,4 @@ D:/asset_bundles
 | `-library_path="D:/asset_bundles/library.json"`              | Yes      | `""`    | If included, this will generate a `library.json` file, a dictionary of multiple records. The data in `record.json` will be included within `library.json`. |
 | `-library_description="My metadata library"`                 | Yes      | `""`    | A description of the metadata library; this is written to `library.json`. |
 | `-cleanup`                                                   | Yes      |         | If included, delete the `prefabs/` and `source_files/` directories after generating the asset bundles and the metadata record. |
+| `-linux`, `-osx`, `-windows`, `-webgl`       | Yes      |          | If you add any of these flags, ModelCreator will create asset bundles for only the specified targets. You can add more than one of these flags. If you don't include any of these flags, ModelCreator defaults to making asset bundles for Linux, OSX, and Windows. |

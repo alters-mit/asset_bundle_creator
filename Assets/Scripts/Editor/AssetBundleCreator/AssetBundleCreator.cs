@@ -36,14 +36,48 @@ public abstract class AssetBundleCreator<T, U>
     /// </summary>
     private bool logging;
     /// <summary>
+    /// Folder names per build target. Never call this directly!
+    /// </summary>
+    private static Dictionary<BuildTarget, string> buildTargetFolders;
+    /// <summary>
     /// Folder names per build target.
     /// </summary>
-    protected readonly static Dictionary<BuildTarget, string> BuildTargetFolders = new Dictionary<BuildTarget, string>()
+    protected static Dictionary<BuildTarget, string> BuildTargetFolders
     {
-        { BuildTarget.StandaloneWindows64, "Windows" },
-        { BuildTarget.StandaloneOSX, "Darwin" },
-        { BuildTarget.StandaloneLinux64, "Linux" }
-    };
+        get
+        {
+            if (buildTargetFolders == null)
+            {
+                buildTargetFolders = new Dictionary<BuildTarget, string>();
+                // Check if the user wants to build asset bundles for specific targets.
+                if (ArgumentParser.GetBoolean("-linux"))
+                {
+                    buildTargetFolders.Add(BuildTarget.StandaloneLinux64, "Linux");
+                }
+                else if (ArgumentParser.GetBoolean("-osx"))
+                {
+                    buildTargetFolders.Add(BuildTarget.StandaloneOSX, "Darwin");
+                }
+                else if (ArgumentParser.GetBoolean("-windows"))
+                {
+                    buildTargetFolders.Add(BuildTarget.StandaloneWindows64, "Windows");
+                }
+                // Add WebGL as a build target.
+                else if (ArgumentParser.GetBoolean("-webgl"))
+                {
+                    buildTargetFolders.Add(BuildTarget.WebGL, "WebGL");
+                }
+                // By default, build asset bundles for Linux, MacOS, and Windows.
+                else
+                {
+                    buildTargetFolders.Add(BuildTarget.StandaloneLinux64, "Linux");
+                    buildTargetFolders.Add(BuildTarget.StandaloneOSX, "Darwin");
+                    buildTargetFolders.Add(BuildTarget.StandaloneWindows64, "Windows");
+                }
+            }
+            return buildTargetFolders;
+        }
+    }
 
 
 
