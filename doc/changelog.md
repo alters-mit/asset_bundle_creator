@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.7
+
+- Fixed: KeyNotFoundException if a build target flag e.g. `-linux` is used when creating asset bundles or records from source files.
+
 ## 2.0.6
 
 - Downgraded to Unity 2020.3.24 to align it with TDW's version.
