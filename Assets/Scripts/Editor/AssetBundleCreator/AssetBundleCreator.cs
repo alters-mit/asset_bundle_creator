@@ -301,11 +301,16 @@ public abstract class AssetBundleCreator<T, U>
 
     /// <summary>
     /// Returns the local file path of the final output path of an asset bundle.
+    /// Returns null if this isn't a valid build target (if the user included a flag like -windows).
     /// </summary>
     /// <param name="target">The build target</param>
     protected string GetAssetBundlePath(BuildTarget target)
     {
-        return Path.Combine(outputDirectory, BuildTargetFolders[target], name);
+        if (BuildTargetFolders.ContainsKey(target))
+        {
+            return Path.Combine(outputDirectory, BuildTargetFolders[target], name);
+        }
+        return null;
     }
 
 
@@ -355,10 +360,16 @@ public abstract class AssetBundleCreator<T, U>
 
     /// <summary>
     /// Returns the local URI file path of the final output path of an asset bundle, including the file:/// prefix.
+    /// Returns an empty string if this is an invalid build target (for example, if user included the flag -windows).
     /// </summary>
     /// <param name="target">The build target.</param>
     private string GetURI(BuildTarget target)
     {
-        return "file:///" + GetAssetBundlePath(target).FixWindowsPath();
+        string assetBundlePath = GetAssetBundlePath(target);
+        if (assetBundlePath == null)
+        {
+            return "";
+        }
+        return "file:///" + GetAssetBundlePath(target).FixWindowsPath();       
     }
 }
