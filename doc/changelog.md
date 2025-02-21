@@ -3,6 +3,7 @@
 ## 2.0.8
 
 - Upgraded to Unity 6.
+- Fixed various crashes due to file paths including double quotes.
 
 ## 2.0.7
 

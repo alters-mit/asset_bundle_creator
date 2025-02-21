@@ -72,7 +72,8 @@ public struct SourceFile
     public SourceFile(string name, string originalPath, string folderNameInProject, string originalDirectory = null, string prefabExtension = ".prefab")
     {
         this.name = name;
-        this.folderNameInProject = Path.GetFileNameWithoutExtension(folderNameInProject);
+        originalPath = originalPath.Replace("\"", "");
+        this.folderNameInProject = Path.GetFileNameWithoutExtension(folderNameInProject.Replace("\"", ""));
         // Assume this is an absolute path.
         if (originalDirectory == null)
         {

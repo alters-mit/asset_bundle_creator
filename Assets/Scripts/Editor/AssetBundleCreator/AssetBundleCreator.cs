@@ -84,7 +84,7 @@ public abstract class AssetBundleCreator<T, U>
     public AssetBundleCreator(string name, string source, string outputDirectory)
     {
         // Fix names that will create bad URIs.
-        this.name = name.UriSafe();
+        this.name = name.UriSafe().Replace("\"", "");
         this.source = new SourceFile(this.name, source, this.name);
         this.outputDirectory = outputDirectory;
         logPath = Path.Combine(outputDirectory, Constants.LOG_FILE_NAME);
@@ -93,9 +93,9 @@ public abstract class AssetBundleCreator<T, U>
 
     public AssetBundleCreator()
     {
-        name = ArgumentParser.Get("name").UriSafe();
+        name = ArgumentParser.Get("name").UriSafe().Replace("\"", "");
         source = new SourceFile(name, ArgumentParser.Get("source"), name);
-        outputDirectory = ArgumentParser.Get("output_directory");
+        outputDirectory = ArgumentParser.Get("output_directory").Replace("\"", "");
         logPath = Path.Combine(outputDirectory, Constants.LOG_FILE_NAME);
     }
 
