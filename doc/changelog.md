@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.8
+
+- Upgraded to Unity 6.
+
 ## 2.0.7
 
 - Fixed: KeyNotFoundException if a build target flag e.g. `-linux` is used when creating asset bundles or records from source files.
